@@ -29,11 +29,29 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install dbt-core dbt-duckdb
 
       - name: dbt deps
         working-directory: dbt
         run: dbt deps
+
+      - name: Create dbt profile
+        working-directory: dbt
+        run: |
+          cat <<'EOF' > profiles.yml
+          evm_duckdb_platform:
+            target: dev
+            outputs:
+              dev:
+                type: duckdb
+                path: ../warehouse/duckdb/analytics.duckdb
+                threads: 4
+          EOF
+
+      - name: Bootstrap empty parquet data
+        run: |
+          python scripts/bootstrap_empty_parquet.py
 
       - name: dbt docs generate
         working-directory: dbt
