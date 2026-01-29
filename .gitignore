@@ -4,4 +4,5 @@ __pycache__/
 warehouse/
 dbt/target/
 dbt/logs/
+dbt/profiles.yml
 .env

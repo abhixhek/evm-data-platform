@@ -11,6 +11,8 @@ from onchain_platform.ingestion.writers.parquet_writer import ParquetWriter
 
 
 def load_logs(path: str, start_block: Optional[int], end_block: Optional[int]) -> List[Dict[str, Any]]:
+    if not os.path.exists(path):
+        return []
     dataset = ds.dataset(path, format="parquet")
     table = dataset.to_table()
     rows = table.to_pylist()
@@ -40,6 +42,9 @@ def main() -> None:
     silver_dir = os.path.join(config.warehouse_dir, "lake", "silver")
 
     logs = load_logs(bronze_logs_path, args.start, args.end)
+    if not logs:
+        print("No logs found to decode. Run ingestion first.")
+        return
     registry = ABIRegistry(os.path.join(os.path.dirname(__file__), "abis"))
 
     writer = ParquetWriter(silver_dir)

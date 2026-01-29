@@ -7,4 +7,4 @@ select
   from_address,
   to_address,
   value_raw
-from {{ ref('event_erc20_transfer') }};
+from {{ ref('event_erc20_transfer') }}

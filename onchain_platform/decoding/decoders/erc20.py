@@ -32,9 +32,12 @@ def decode_transfers(
             continue
         if len(topics) < 3:
             continue
+        data = log.get("data") or "0x"
+        if len(data) < 66:
+            continue
         from_addr = _topic_to_address(topics[1])
         to_addr = _topic_to_address(topics[2])
-        value = decode(["uint256"], bytes.fromhex(log.get("data", "0x")[2:]))[0]
+        value = decode(["uint256"], bytes.fromhex(data[2:]))[0]
 
         decoded.append(
             {
@@ -45,7 +48,7 @@ def decode_transfers(
                 "contract_address": log.get("address"),
                 "from_address": from_addr,
                 "to_address": to_addr,
-                "value_raw": int(value),
+                "value_raw": str(int(value)),
             }
         )
 

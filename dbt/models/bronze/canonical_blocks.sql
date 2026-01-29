@@ -1,2 +1,2 @@
 select *
-from read_parquet('../warehouse/lake/bronze/canonical_blocks/*.parquet');
+from read_parquet('../warehouse/lake/bronze/canonical_blocks/*.parquet')

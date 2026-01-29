@@ -17,6 +17,12 @@ def hex_to_int(value: Optional[str]) -> Optional[int]:
     return int(value, 16)
 
 
+def hex_to_str(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    return str(int(value, 16))
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -53,7 +59,7 @@ def normalize_block(chain_id: int, block: Dict[str, Any]) -> Dict[str, Any]:
         "miner": block.get("miner"),
         "gas_used": hex_to_int(block.get("gasUsed")),
         "gas_limit": hex_to_int(block.get("gasLimit")),
-        "base_fee_per_gas": hex_to_int(block.get("baseFeePerGas")),
+        "base_fee_per_gas": hex_to_str(block.get("baseFeePerGas")),
         "tx_count": len(block.get("transactions", [])),
         "observed_at": now_iso(),
     }
@@ -71,9 +77,9 @@ def normalize_transactions(chain_id: int, block: Dict[str, Any]) -> Iterable[Dic
             "tx_index": hex_to_int(tx.get("transactionIndex")),
             "from_address": tx.get("from"),
             "to_address": tx.get("to"),
-            "value": hex_to_int(tx.get("value")),
-            "gas": hex_to_int(tx.get("gas")),
-            "gas_price": hex_to_int(tx.get("gasPrice")),
+            "value": hex_to_str(tx.get("value")),
+            "gas": hex_to_str(tx.get("gas")),
+            "gas_price": hex_to_str(tx.get("gasPrice")),
             "nonce": hex_to_int(tx.get("nonce")),
             "input": tx.get("input"),
         }
