@@ -1,0 +1,19 @@
+name: evm_duckdb_platform
+version: '1.0.0'
+config-version: 2
+
+profile: evm_duckdb_platform
+
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+models:
+  evm_duckdb_platform:
+    bronze:
+      materialized: view
+    silver:
+      materialized: view
+    gold:
+      materialized: table

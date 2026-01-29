@@ -1,0 +1,7 @@
+aiohttp>=3.9.0
+python-dotenv>=1.0.0
+pyarrow>=15.0.0
+eth-abi>=5.1.0
+eth-utils>=2.3.0
+hexbytes>=0.3.1
+duckdb>=1.0.0

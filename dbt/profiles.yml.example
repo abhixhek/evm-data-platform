@@ -1,0 +1,7 @@
+evm_duckdb_platform:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../warehouse/duckdb/analytics.duckdb
+      threads: 8

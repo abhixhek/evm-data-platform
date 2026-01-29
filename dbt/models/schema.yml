@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: blocks_raw
+    description: "Raw block metadata from JSON-RPC."
+    columns:
+      - name: chain_id
+        description: "EVM chain id (e.g., 1 for Ethereum)."
+        tests:
+          - not_null
+      - name: block_number
+        description: "Block height."
+        tests:
+          - not_null
+      - name: block_hash
+        description: "Block hash."
+      - name: parent_hash
+        description: "Parent block hash."
+      - name: timestamp
+        description: "Block timestamp (unix seconds)."
+      - name: miner
+        description: "Coinbase/miner address."
+      - name: gas_used
+        description: "Total gas used in the block."
+      - name: gas_limit
+        description: "Block gas limit."
+      - name: base_fee_per_gas
+        description: "Base fee per gas (post London)."
+      - name: tx_count
+        description: "Number of transactions in the block."
+      - name: observed_at
+        description: "Ingestion observation time (UTC)."
+
+  - name: transactions_raw
+    description: "Raw transactions from JSON-RPC (full tx objects)."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+        tests:
+          - not_null
+      - name: block_number
+        description: "Block height containing the transaction."
+      - name: block_hash
+        description: "Block hash containing the transaction."
+      - name: tx_hash
+        description: "Transaction hash."
+        tests:
+          - not_null
+      - name: tx_index
+        description: "Transaction index within block."
+      - name: from_address
+        description: "Sender address."
+      - name: to_address
+        description: "Recipient address (or contract)."
+      - name: value
+        description: "Value transferred in wei."
+      - name: gas
+        description: "Gas limit for the transaction."
+      - name: gas_price
+        description: "Gas price in wei."
+      - name: nonce
+        description: "Sender nonce."
+      - name: input
+        description: "Calldata input."
+
+  - name: logs_raw
+    description: "Raw logs from JSON-RPC eth_getLogs."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+        tests:
+          - not_null
+      - name: block_number
+        description: "Block height containing the log."
+      - name: block_hash
+        description: "Block hash containing the log."
+      - name: tx_hash
+        description: "Transaction hash for the log."
+      - name: tx_index
+        description: "Transaction index within block."
+      - name: log_index
+        description: "Log index within the transaction."
+      - name: address
+        description: "Emitting contract address."
+      - name: data
+        description: "Log data blob."
+      - name: topics
+        description: "Array of log topics."
+      - name: removed
+        description: "Reorg flag from node (true if removed)."
+
+  - name: canonical_blocks
+    description: "Canonical-chain index for observed blocks."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+      - name: block_number
+        description: "Block height."
+      - name: block_hash
+        description: "Block hash."
+      - name: parent_hash
+        description: "Parent block hash."
+      - name: is_canonical
+        description: "True if canonical at observation time."
+      - name: observed_at
+        description: "Ingestion observation time (UTC)."
+
+  - name: event_erc20_transfer
+    description: "Decoded ERC20 Transfer events from logs."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+      - name: block_number
+        description: "Block height at which the event was emitted."
+      - name: tx_hash
+        description: "Transaction hash that emitted the log."
+      - name: log_index
+        description: "Log index within the transaction."
+      - name: contract_address
+        description: "Token contract emitting Transfer."
+      - name: from_address
+        description: "Sender address."
+      - name: to_address
+        description: "Recipient address."
+      - name: value_raw
+        description: "Raw token amount (integer, before decimals)."
+
+  - name: erc20_transfers
+    description: "Curated ERC20 transfers with normalized column names."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+      - name: block_number
+        description: "Block height."
+      - name: tx_hash
+        description: "Transaction hash."
+      - name: log_index
+        description: "Log index within the transaction."
+      - name: token_address
+        description: "ERC20 token contract."
+      - name: from_address
+        description: "Sender address."
+      - name: to_address
+        description: "Recipient address."
+      - name: value_raw
+        description: "Raw token amount (integer)."

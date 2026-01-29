@@ -1,0 +1,1 @@
+"""Writers for lake storage."""

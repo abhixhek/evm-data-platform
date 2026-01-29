@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+warehouse/
+dbt/target/
+dbt/logs/
+.env
