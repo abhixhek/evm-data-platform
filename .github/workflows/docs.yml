@@ -52,7 +52,10 @@ jobs:
       - name: Create DuckDB file
         run: |
           mkdir -p warehouse/duckdb
-          touch warehouse/duckdb/analytics.duckdb
+          python - <<'PY'
+          import duckdb
+          duckdb.connect('warehouse/duckdb/analytics.duckdb').close()
+          PY
 
       - name: Bootstrap empty parquet data
         run: |
