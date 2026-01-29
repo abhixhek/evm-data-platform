@@ -49,6 +49,11 @@ jobs:
                 threads: 4
           EOF
 
+      - name: Create DuckDB file
+        run: |
+          mkdir -p warehouse/duckdb
+          touch warehouse/duckdb/analytics.duckdb
+
       - name: Bootstrap empty parquet data
         run: |
           python scripts/bootstrap_empty_parquet.py
