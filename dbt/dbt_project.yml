@@ -5,6 +5,7 @@ config-version: 2
 profile: evm_duckdb_platform
 
 model-paths: ["models"]
+docs-paths: ["docs"]
 analysis-paths: ["analysis"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
