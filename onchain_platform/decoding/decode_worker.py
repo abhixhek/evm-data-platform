@@ -7,6 +7,7 @@ import pyarrow.dataset as ds
 from onchain_platform.config import Config
 from onchain_platform.decoding.abi_registry import ABIRegistry
 from onchain_platform.decoding.decoders.erc20 import decode_transfers
+from onchain_platform.decoding.decoders.uniswap_v2 import decode_swaps
 from onchain_platform.ingestion.writers.parquet_writer import ParquetWriter
 
 
@@ -52,6 +53,9 @@ def main() -> None:
     if args.protocol == "erc20":
         decoded = decode_transfers(registry, logs)
         writer.write_rows("event_erc20_transfer", decoded, filename="erc20_transfer.parquet")
+    elif args.protocol == "uniswap_v2":
+        decoded = decode_swaps(registry, logs)
+        writer.write_rows("event_uniswap_v2_swap", decoded, filename="uniswap_v2_swap.parquet")
     else:
         raise RuntimeError(f"Unsupported protocol: {args.protocol}")
 

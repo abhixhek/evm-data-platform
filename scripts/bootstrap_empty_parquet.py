@@ -99,6 +99,25 @@ def main() -> None:
         ),
     )
 
+    write_empty(
+        os.path.join(base, "silver", "event_uniswap_v2_swap", "part.parquet"),
+        pa.schema(
+            [
+                ("chain_id", pa.int64()),
+                ("block_number", pa.int64()),
+                ("tx_hash", pa.string()),
+                ("log_index", pa.int64()),
+                ("pair_address", pa.string()),
+                ("sender", pa.string()),
+                ("to_address", pa.string()),
+                ("amount0_in", pa.string()),
+                ("amount1_in", pa.string()),
+                ("amount0_out", pa.string()),
+                ("amount1_out", pa.string()),
+            ]
+        ),
+    )
+
 
 if __name__ == "__main__":
     main()

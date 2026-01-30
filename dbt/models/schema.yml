@@ -1,5 +1,19 @@
 version: 2
 
+docs:
+  - name: pipeline_metrics
+    description: |
+      ## Pipeline Metrics (Sample Run)
+      **Range:** 19,490,000–19,498,999  
+      **Blocks:** 5,822  
+      **Transactions:** 1,088,063  
+      **Logs:** 2,208,560  
+      **ERC20 Transfers:** 1,015,012  
+      **Uniswap V2 Swaps:** 125,553  
+
+      **dbt tests passed:** 33  
+      **Docs generated:** OK  
+
 models:
   - name: blocks_raw
     description: "Raw block metadata from JSON-RPC."
@@ -8,10 +22,14 @@ models:
         description: "EVM chain id (e.g., 1 for Ethereum)."
         tests:
           - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
       - name: block_number
         description: "Block height."
         tests:
           - not_null
+          - unique
       - name: block_hash
         description: "Block hash."
       - name: parent_hash
@@ -38,6 +56,9 @@ models:
         description: "EVM chain id."
         tests:
           - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
       - name: block_number
         description: "Block height containing the transaction."
       - name: block_hash
@@ -46,6 +67,7 @@ models:
         description: "Transaction hash."
         tests:
           - not_null
+          - unique
       - name: tx_index
         description: "Transaction index within block."
       - name: from_address
@@ -70,16 +92,23 @@ models:
         description: "EVM chain id."
         tests:
           - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
       - name: block_number
         description: "Block height containing the log."
       - name: block_hash
         description: "Block hash containing the log."
       - name: tx_hash
         description: "Transaction hash for the log."
+        tests:
+          - not_null
       - name: tx_index
         description: "Transaction index within block."
       - name: log_index
         description: "Log index within the transaction."
+        tests:
+          - not_null
       - name: address
         description: "Emitting contract address."
       - name: data
@@ -110,12 +139,21 @@ models:
     columns:
       - name: chain_id
         description: "EVM chain id."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
       - name: block_number
         description: "Block height at which the event was emitted."
       - name: tx_hash
         description: "Transaction hash that emitted the log."
+        tests:
+          - not_null
       - name: log_index
         description: "Log index within the transaction."
+        tests:
+          - not_null
       - name: contract_address
         description: "Token contract emitting Transfer."
       - name: from_address
@@ -125,17 +163,61 @@ models:
       - name: value_raw
         description: "Raw token amount (integer, before decimals)."
 
+  - name: event_uniswap_v2_swap
+    description: "Decoded Uniswap V2 Swap events from pair contracts."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+      - name: block_number
+        description: "Block height at which the swap was emitted."
+      - name: tx_hash
+        description: "Transaction hash emitting the swap."
+        tests:
+          - not_null
+      - name: log_index
+        description: "Log index within the transaction."
+        tests:
+          - not_null
+      - name: pair_address
+        description: "Uniswap V2 pair contract address."
+      - name: sender
+        description: "Swap sender address."
+      - name: to_address
+        description: "Swap recipient address."
+      - name: amount0_in
+        description: "Token0 amount in (raw integer as string)."
+      - name: amount1_in
+        description: "Token1 amount in (raw integer as string)."
+      - name: amount0_out
+        description: "Token0 amount out (raw integer as string)."
+      - name: amount1_out
+        description: "Token1 amount out (raw integer as string)."
+
   - name: erc20_transfers
     description: "Curated ERC20 transfers with normalized column names."
     columns:
       - name: chain_id
         description: "EVM chain id."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
       - name: block_number
         description: "Block height."
       - name: tx_hash
         description: "Transaction hash."
+        tests:
+          - not_null
       - name: log_index
         description: "Log index within the transaction."
+        tests:
+          - not_null
       - name: token_address
         description: "ERC20 token contract."
       - name: from_address
@@ -144,3 +226,38 @@ models:
         description: "Recipient address."
       - name: value_raw
         description: "Raw token amount (integer)."
+
+  - name: dex_trades
+    description: "Unified DEX trade view (currently Uniswap V2 swaps)."
+    columns:
+      - name: chain_id
+        description: "EVM chain id."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1]
+      - name: block_number
+        description: "Block height for the trade."
+      - name: tx_hash
+        description: "Transaction hash for the trade."
+        tests:
+          - not_null
+      - name: log_index
+        description: "Log index within the transaction."
+        tests:
+          - not_null
+      - name: pair_address
+        description: "DEX pair/pool address."
+      - name: sender
+        description: "Trade sender."
+      - name: to_address
+        description: "Trade recipient."
+      - name: amount0_in
+        description: "Token0 amount in (raw integer as string)."
+      - name: amount1_in
+        description: "Token1 amount in (raw integer as string)."
+      - name: amount0_out
+        description: "Token0 amount out (raw integer as string)."
+      - name: amount1_out
+        description: "Token1 amount out (raw integer as string)."

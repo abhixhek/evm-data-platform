@@ -117,6 +117,7 @@ async def fetch_range(
     chain_id: int,
     start_block: int,
     end_block: int,
+    log_chunk: int,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
     blocks: List[Dict[str, Any]] = []
     txs: List[Dict[str, Any]] = []
@@ -139,8 +140,12 @@ async def fetch_range(
         canon.append(canonical_row(chain_id, block, is_canonical))
         previous_hash = block.get("hash")
 
-    logs_raw = await client.get_logs(start_block, end_block)
-    logs.extend(list(normalize_logs(chain_id, logs_raw)))
+    if log_chunk <= 0:
+        log_chunk = end_block - start_block + 1
+    for chunk_start in range(start_block, end_block + 1, log_chunk):
+        chunk_end = min(chunk_start + log_chunk - 1, end_block)
+        logs_raw = await client.get_logs(chunk_start, chunk_end)
+        logs.extend(list(normalize_logs(chain_id, logs_raw)))
     return blocks, txs, logs, canon
 
 
@@ -155,14 +160,26 @@ async def run_worker(args: argparse.Namespace) -> None:
     writer = ParquetWriter(os.path.join(config.warehouse_dir, "lake", "bronze"))
 
     async with AsyncRPCClient(config.rpc_url, max_concurrency=args.rpc_concurrency) as client:
+        latest_block = None
+        finalized_end = None
+        if not args.ignore_finality:
+            latest_block = await client.get_block_number()
+            finalized_end = max(latest_block - config.finality_depth, 0)
         for plan in plans:
             if checkpoint.is_done(plan):
+                continue
+            if finalized_end is not None and plan.end_block > finalized_end:
+                print(
+                    f"Skipping range {plan.start_block}-{plan.end_block} "
+                    f"(finalized_end={finalized_end})."
+                )
                 continue
             blocks, txs, logs, canon = await fetch_range(
                 client,
                 config.chain_id,
                 plan.start_block,
                 plan.end_block,
+                args.log_chunk,
             )
 
             range_tag = f"{plan.start_block}_{plan.end_block}.parquet"
@@ -188,6 +205,17 @@ def main() -> None:
     parser.add_argument("--checkpoints", default="warehouse/state/checkpoints.json")
     parser.add_argument("--state", default="warehouse/state/canonical_state.json")
     parser.add_argument("--rpc-concurrency", type=int, default=6)
+    parser.add_argument(
+        "--log-chunk",
+        type=int,
+        default=100,
+        help="Block range size per eth_getLogs call (lower for free-tier RPCs).",
+    )
+    parser.add_argument(
+        "--ignore-finality",
+        action="store_true",
+        help="Ingest ranges even if they are within the finality depth.",
+    )
     args = parser.parse_args()
 
     asyncio.run(run_worker(args))

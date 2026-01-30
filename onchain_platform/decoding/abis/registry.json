@@ -1,0 +1,16 @@
+{
+  "erc20": [
+    {
+      "version": "1",
+      "start_block": 0,
+      "abi": "erc20.json"
+    }
+  ],
+  "uniswap_v2": [
+    {
+      "version": "1",
+      "start_block": 10000000,
+      "abi": "uniswap_v2_pair.json"
+    }
+  ]
+}
