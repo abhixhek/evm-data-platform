@@ -1,9 +1,5 @@
 version: 2
 
-docs:
-  - name: pipeline_metrics
-    description: "{{ doc('pipeline_metrics') }}"
-
 models:
   - name: blocks_raw
     description: "Raw block metadata from JSON-RPC."
@@ -189,7 +185,7 @@ models:
         description: "Token1 amount out (raw integer as string)."
 
   - name: erc20_transfers
-    description: "Curated ERC20 transfers with normalized column names. See {{ doc('pipeline_metrics') }} for the latest run metrics."
+    description: "Curated ERC20 transfers with normalized column names."
     columns:
       - name: chain_id
         description: "EVM chain id."
@@ -218,7 +214,7 @@ models:
         description: "Raw token amount (integer)."
 
   - name: dex_trades
-    description: "Unified DEX trade view (currently Uniswap V2 swaps). See {{ doc('pipeline_metrics') }} for the latest run metrics."
+    description: "Unified DEX trade view (currently Uniswap V2 swaps)."
     columns:
       - name: chain_id
         description: "EVM chain id."
