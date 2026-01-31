@@ -12,5 +12,4 @@
 **dbt tests passed:** 33  
 **Docs generated:** OK  
 
-Tip: Search for **pipeline_metrics** in the sidebar to view the full doc block.
 {% enddocs %}
